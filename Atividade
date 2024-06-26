@@ -1,0 +1,86 @@
+// Gabriel Afonso dos Santos CB3026167 
+// Bruno Souza da Costa CB3025411
+
+CREATE DATABASE banco_aula;
+
+CREATE TABLE projeto (
+    numproj INT PRIMARY KEY,
+    nome VARCHAR(100),
+    lugar VARCHAR(100)
+);
+
+CREATE TABLE departamento (
+    numdep INT PRIMARY KEY,
+    nome VARCHAR(50),
+    lugar VARCHAR(50),
+    projeto INT,
+    FOREIGN KEY (projeto) REFERENCES projeto(numproj)
+);
+
+CREATE TABLE funcionario (
+    cpf VARCHAR(14) PRIMARY KEY,
+    nome VARCHAR(50),
+    datanasc DATE,
+    endereco VARCHAR(200),
+    cpf_supervisor VARCHAR(14),
+    departamento INT,
+    FOREIGN KEY (cpf_supervisor) REFERENCES funcionario (cpf),
+    FOREIGN KEY (departamento) REFERENCES departamento (numdep)
+);
+INSERT INTO projeto VALUES
+    (0, 'Bruno', 'Casa1'),
+    (1, 'Caua', 'Casa2');
+
+INSERT INTO departamento VALUES
+    (0, 'Dep0', 'Sala0', 0),
+    (1, 'Dep1', 'Sala1', 0),
+    (2, 'Dep2', 'Sala2', 1),
+    (3, 'Dep3', 'Sala3', 1),
+    (4, 'Dep4', 'Sala4', 1);
+
+INSERT INTO funcionario (cpf, nome, datanasc, endereco, cpf_supervisor, departamento) VALUES
+    ('1', 'Supervisor A', '1990-01-01', 'Endereço Supervisor A', NULL, 1),
+    ('2', 'Supervisor B', '1985-05-15', 'Endereço Supervisor B', NULL, 2),
+    ('101', 'Funcionário 1', '1995-03-10', 'Endereço Funcionário 1', '1', 1),
+    ('102', 'Funcionário 2', '1998-07-20', 'Endereço Funcionário 2', '1', 1),
+    ('103', 'Funcionário 3', '1993-09-05', 'Endereço Funcionário 3', '2', 2),
+    ('104', 'Funcionário 4', '1990-11-12', 'Endereço Funcionário 4', '2', 2),
+    ('105', 'Funcionário 5', '1988-04-25', 'Endereço Funcionário 5', '1', 3),
+    ('106', 'Funcionário 6', '1991-08-30', 'Endereço Funcionário 6', '2', 3),
+    ('107', 'Funcionário 7', '1994-06-17', 'Endereço Funcionário 7', '1', 4),
+    ('108', 'Funcionário 8', '1997-02-22', 'Endereço Funcionário 8', '2', 4),
+    ('109', 'Funcionário 9', '1996-12-08', 'Endereço Funcionário 9', '1', 0),
+    ('110', 'Funcionário 10', '1987-10-03', 'Endereço Funcionário 10', '2', 0),
+    ('111', 'Funcionário 11', '1999-04-18', 'Endereço Funcionário 11', '1', 1),
+    ('112', 'Funcionário 12', '1992-11-25', 'Endereço Funcionário 12', '1', 2);
+
+UPDATE departamento SET nome = 'Dep0', lugar = 'Sala0' WHERE numdep = 0;
+UPDATE departamento SET nome = 'Dep1', lugar = 'Sala1' WHERE numdep = 1;
+UPDATE departamento SET nome = 'Dep2', lugar = 'Sala2' WHERE numdep = 2;
+UPDATE departamento SET nome = 'Dep3', lugar = 'Sala3' WHERE numdep = 3;
+UPDATE departamento SET nome = 'Dep4', lugar = 'Sala4' WHERE numdep = 4;
+
+CREATE VIEW vw_funcionarios_com_supervisor_e_departamento AS
+SELECT 
+    f.nome AS funcionario_nome,
+    f.cpf AS funcionario_cpf,
+    f.cpf_supervisor,
+    s.nome AS supervisor_nome,
+    d.nome AS departamento_nome
+FROM 
+    funcionario f
+    LEFT JOIN funcionario s ON f.cpf_supervisor = s.cpf
+    JOIN departamento d ON f.departamento = d.numdep;
+
+SELECT 
+    p.nome AS projeto_nome,
+    COUNT(f.cpf) AS quantidade_funcionarios
+FROM 
+    projeto p
+    LEFT JOIN departamento d ON p.numproj = d.projeto
+    LEFT JOIN funcionario f ON d.numdep = f.departamento
+GROUP BY 
+    p.numproj, p.nome;
+
+
+
